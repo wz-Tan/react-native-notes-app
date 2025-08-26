@@ -1,4 +1,4 @@
-import databaseService from "./databaseSerbvice";
+import databaseService from "./databaseService";
 import { ID } from "react-native-appwrite";
 
 //Appwrite Database and Collection ID
@@ -30,7 +30,28 @@ const noteService = {
         if (response?.error) {return {error: response.error}};
 
         return {data: response}
+    },
+
+    //Delete Note
+    async deleteNote(id){
+        const response=await databaseService.deleteDocument(dbId,colId,id);
+        if (response.error){
+            return {error:response.error}
+        }
+
+        return {success:true}
+    },
+
+    async updateNote(id,text){
+        const response=await databaseService.updateDocument(dbId,colId,id,{text});
+        if (response.error){
+            return {error:response.error}
+        }
+
+        return {data:response}
     }
+
+
 }
 
 export default noteService

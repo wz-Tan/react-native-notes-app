@@ -22,6 +22,29 @@ const databaseService={
             console.error("Error Creating Documents", error.message);
             return {error: error.message};
         }
+    },
+
+    //Delete Document
+    async deleteDocument(dbId,colId,id){
+        try{
+            await database.deleteDocument(dbId,colId,id);
+            return {success:true}
+        }
+        catch(error){
+            console.error("Error Deleting Documents", error.message);
+            return {error: error.message};
+        }
+    },
+
+    //Update Document
+    async updateDocument(dbId,colId,id,data){
+         try{
+            return await database.updateDocument(dbId,colId,id,data);
+        }
+        catch(error){
+            console.error("Error Updating Documents", error.message);
+            return {error: error.message};
+        }
     }
 }
 
