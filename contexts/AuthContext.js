@@ -17,8 +17,7 @@ export const AuthProvider=({children})=>{
     const checkUser = async() => {
         setLoading(true);
         const response= await authService.getUser();
-
-        if (response.error){
+        if (response?.error ){
             setUser(null)
         }
         else{
@@ -26,6 +25,7 @@ export const AuthProvider=({children})=>{
         }
 
         setLoading(false)
+
     }
 
     //Login First then Acquire User
@@ -57,13 +57,13 @@ export const AuthProvider=({children})=>{
     }
 
     return (
-        <AuthProvider.Provider value={{
+        <AuthContext.Provider value={{
             user,login,register,logout,loading
         }} >
             {children}
-        </AuthProvider.Provider>
+        </AuthContext.Provider>
     )
 }
 
-//Use the Freshly Created Context
+//Wrap the Layout in the Provider, then import useAuth into the children
 export const useAuth = () => useContext(AuthContext)

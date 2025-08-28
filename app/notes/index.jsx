@@ -4,22 +4,34 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import NoteList from "../../components/NoteList";
-import databaseService from "@/services/databaseService";
+import { useRouter } from "expo-router";
+import { useAuth } from "@/contexts/AuthContext";
 
 const NoteScreen = () => {
+    const router = useRouter();
+    const {user, loading:authloading} = useAuth()
     const [modalVisible, setModalVisible] = useState(false)
     const [newNote, setNewNote] = useState("")
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [notes, setNotes] = useState([])
 
+    useEffect(()=>{
+        //Switch Pages if Not Loading and No User
+        if (!authloading && !user){
+            router.replace('/auth')
+        }
+    },[user,authloading])
+
     useEffect(() => {
-        fetchNotes();
-    }, [])
+        if (user){
+            fetchNotes();
+        }
+    }, [user])
 
     const fetchNotes = async () => {
         setLoading(true);
-        const response = await noteService.getNotes();
+        const response = await noteService.getNotes(user.$id);
 
         if (response.error) {
             setError(response.error)
@@ -39,7 +51,7 @@ const NoteScreen = () => {
         if (newNote.trim() === "") return;
         setLoading(true)
 
-        const response = await noteService.addNote(newNote)
+        const response = await noteService.addNote(user.$id,newNote)
         if (response.error) {
             Alert.alert("error", response.error)
 
@@ -105,7 +117,8 @@ const NoteScreen = () => {
                     (
                         <>
                             {error && <Text style={styles.errorText}>{error}</Text>}
-                            <NoteList notes={notes} onDelete={deleteNote} onEdit={editNote} />
+                            {notes.length===0 ? (<Text style={styles.emptyText}>Write Something...</Text>) : (<NoteList notes={notes} onDelete={deleteNote} onEdit={editNote} />)}
+                            
                         </>
                     )}
 
@@ -151,5 +164,12 @@ const styles = StyleSheet.create({
         textAlign: "center",
         marginBottom: 10,
         fontSize: 16
+    },
+    emptyText: {
+        color: "black",
+        textAlign: "center",
+        marginBottom: 10,
+        fontSize: 24,
+        fontWeight: "bold"
     }
 })
